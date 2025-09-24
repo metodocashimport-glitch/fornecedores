@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lojas • Sneakers — Diretório</title>
+  <meta name="description" content="Diretório minimalista de lojas Sneakers com links clicáveis." />
+  <style>
+    :root{
+      --bg:#ffffff; --text:#0b1220; --muted:#6b7280; --card:#f8fafc; --accent:#111827;
+      --radius:10px; --gap:14px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; padding:32px; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+    .container{max-width:880px; margin:0 auto}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:22px}
+    .logo{font-size:20px;font-weight:700}
+    h1{font-size:18px;margin:0}
+    p.subtitle{margin:0;color:var(--muted);font-size:13px}
+
+    .card{background:var(--card);border-radius:var(--radius);padding:18px;border:1px solid #eff2f5}
+    .controls{display:flex;gap:10px;margin-bottom:14px}
+    input.search{flex:1;padding:10px 12px;border-radius:8px;border:1px solid #e6e9ee;font-size:14px}
+    .btn{padding:10px 12px;border-radius:8px;border:0;background:#111827;color:#fff;font-size:14px;cursor:pointer}
+    .list{margin-top:8px;display:grid;gap:10px}
+    .item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:8px;background:white;border:1px solid #f1f5f9}
+    .left{display:flex;gap:12px;align-items:center}
+    .store-name{font-weight:600}
+    .category{font-size:12px;color:var(--muted)}
+    .link a{color:#0b63ff;text-decoration:none;font-size:13px}
+    .link a:hover{text-decoration:underline}
+    footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+
+    @media (max-width:600px){body{padding:18px}.controls{flex-direction:column}.btn{width:100%}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">👟 Sneakers Directory</div>
+      <div style="flex:1">
+        <h1>Diretório minimalista — Lojas &amp; Links</h1>
+        <p class="subtitle">Lista com links clicáveis — abra em nova aba ao clicar.</p>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="controls">
+        <input id="search" class="search" placeholder="Buscar loja... (ex: OVO, YOLO)" />
+        <button id="reset" class="btn" title="Mostrar todas">Reset</button>
+      </div>
+
+      <div id="list" class="list" aria-live="polite"></div>
+    </section>
+
+    <footer>
+      Arquivo gerado — se quiser exportar para HTML estático ou que eu coloque ícones/cores, diga qual estilo.
+    </footer>
+  </div>
+
+  <script>
+    // Dados das lojas
+    const stores = [
+      {name: "Love Just Reps", url: "https://yupoorep.com", category: "Sneakers"},
+      {name: "BMLIN", url: "https://boostmasterlinclothes.x.yupoo.com", category: "Sneakers"},
+      {name: "JMDY", url: "https://tianjin-no1.x.yupoo.com", category: "Sneakers"},
+      {name: "OVO", url: "https://ovosneaker.x.yupoo.com", category: "Sneakers"},
+      {name: "PAI", url: "https://pai-reps.x.yupoo.com", category: "Sneakers"},
+      {name: "ANDY MADE", url: "https://andymade.x.yupoo.com", category: "Sneakers"},
+      {name: "PANDA VAULT", url: "https://pandavault.x.yupoo.com/", category: "Sneakers"},
+      {name: "YOLO", url: "https://yolo66.x.yupoo.com/albums", category: "Sneakers"},
+      {name: "STSA", url: "https://x.yupoo.com/category/4704089", category: "Sneakers"},
+      {name: "GOD-SNKRS", url: "https://god-1.x.yupoo.com/", category: "Sneakers"}
+    ];
+
+    const listEl = document.getElementById('list');
+    const searchEl = document.getElementById('search');
+    const resetBtn = document.getElementById('reset');
+
+    function render(items){
+      listEl.innerHTML = '';
+      if(items.length === 0){
+        listEl.innerHTML = '<div style="color:var(--muted);padding:14px;border-radius:8px;background:#fff;border:1px dashed #f1f5f9">Nenhuma loja encontrada.</div>';
+        return;
+      }
+      items.forEach(s => {
+        const item = document.createElement('div');
+        item.className = 'item';
+
+        const left = document.createElement('div');
+        left.className = 'left';
+
+        const name = document.createElement('div');
+        name.innerHTML = '<div class="store-name">' + s.name + '</div><div class="category">' + s.category + '</div>';
+
+        left.appendChild(name);
+
+        const right = document.createElement('div');
+        right.className = 'link';
+        // abrir em nova aba
+        right.innerHTML = '<a href="' + s.url + '" target="_blank" rel="noopener noreferrer">Abrir loja ↗</a>';
+
+        item.appendChild(left);
+        item.appendChild(right);
+        listEl.appendChild(item);
+      });
+    }
+
+    // Filtrar
+    searchEl.addEventListener('input', (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      if(!q){ render(stores); return }
+      const filtered = stores.filter(s => s.name.toLowerCase().includes(q) || s.category.toLowerCase().includes(q));
+      render(filtered);
+    });
+
+    resetBtn.addEventListener('click', () => { searchEl.value = ''; render(stores); searchEl.focus(); });
+
+    // Render inicial
+    render(stores);
+  </script>
+</body>
+</html>
